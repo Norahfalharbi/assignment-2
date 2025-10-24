@@ -1,1 +1,242 @@
+:root {
+  --bg: #ffffff;
+  --text: #4e525a;
+  --accent: #e64a27;
+  --card: #dbdbdb;
+  --border: #e2e8f0;
+}
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+    --text: #e5e7eb;
+    --accent: #60a5fa;
+    --card: #111827;
+    --border: #1f2937;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* Section wrapper */
+.section {
+  padding: 2rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.section h2 {
+  font-size: 1.8rem;
+  margin: 0 0 1rem;
+}
+
+/* Navigation */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between; /* logo left, links right */
+  align-items: center;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.nav-link:hover,
+.nav-link:focus {
+  color: var(--accent);
+}
+
+/*Introduction*/
+.Introduction {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+.inner h1 {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  margin: 0 0 0.5rem;
+}
+
+/*Projects */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.card-media {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  padding: 1rem;
+}
+.card-media img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.card-body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.card-body h3 {
+  margin: 0;
+}
+.card-body {
+  min-height: 90px;
+}
+
+.card-actions {
+  padding: 0.75rem 1rem;
+}
+.card-actions .btn {
+  width: 100%;
+  border-radius: 0.6rem;
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+/*Buttons */
+.btn {
+  display: inline-block;
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  cursor: pointer;
+  color: inherit;
+  background: transparent;
+  font-weight: 500;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: transparent;
+}
+.btn.primary:hover {
+  opacity: 0.9;
+}
+/* Forms */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.grid-2 .full {
+  grid-column: 1 / -1;
+}
+
+label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 500;
+}
+input,
+textarea {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+input:focus,
+textarea:focus {
+  outline: 2px solid color-mix(in hsl, var(--accent) 40%, transparent);
+  outline-offset: 1px;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Footer */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid var(--border);
+}
+.to-top {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+/*Responsive*/
+@media (max-width: 900px) {
+  .Introduction {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    text-align: center;
+  }
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .nav-links {
+    gap: 1.5rem;
+  }
+}
