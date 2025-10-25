@@ -6,15 +6,6 @@
   --border: #e2e8f0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0b1020;
-    --text: #e5e7eb;
-    --accent: #60a5fa;
-    --card: #111827;
-    --border: #1f2937;
-  }
-}
 
 * {
   box-sizing: border-box;
@@ -99,10 +90,8 @@ body {
 
 /*Projects */
 .projects-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  align-items: stretch;
+ column-count: 2;              /* how many columns on desktop */
+  column-gap: 1.25rem;
 }
 
 .card {
@@ -239,4 +228,84 @@ textarea:focus {
   .nav-links {
     gap: 1.5rem;
   }
+  .projects-grid { column-count: 1; }
+   
 }
+.projects-grid .card {
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 1.25rem;          /* space between rows */
+  break-inside: avoid;
+}
+.projects-grid .card.is-hiding {
+  opacity: 0;
+  transform: translateY(4px) scale(0.98);
+}
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;           /* space between buttons */
+  margin-bottom: 1.2rem;   /* space below the buttons */
+}
+.filter .btn.active { outline: 2px solid #e64a27; }
+
+.card-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+  border-top: 1px solid var(--border);
+  padding: 0 1rem;
+}
+.card-details.open {
+  max-height: 400px;
+  opacity: 1;
+  padding: 1rem;
+}
+
+html[data-theme="light"] {
+  --bg:#ffffff; --text:#4e525a; --accent:#e64a27; --card:#dbdbdb; --border:#e2e8f0;
+}
+html[data-theme="dark"] {
+  --bg:#0b1020; --text:#e5e7eb; --accent:#60a5fa; --card:#111827; --border:#1f2937;
+}
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.book-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.book-card img {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+.error {
+  color: #dc2626; /* red */
+  font-size: 0.9rem;
+}
+#formMessage {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+#formMessage.success {
+  color: #16a34a; /* green */
+}
+#formMessage.error {
+  color: #dc2626;
+}
+

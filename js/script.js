@@ -10,9 +10,265 @@ if (now.getHours() < 12) {
 } else {
   greeting = "Good Evening";
 }
-
+// Check if the user's name is already stored in localStorage
+let userName = localStorage.getItem("userName");
+if(!userName){
+    userName=prompt("Hi! what is your name?");
+    if(userName){
+        localStorage.setItem("userName", userName);
+    }   
+ 
+}
 // Show a popup alert with the greeting + current time
 alert(
-  greeting + " Welcome to My Website" + 
-  " and Time is " + now.getHours() + ":" + now.getMinutes()
+  greeting +" "+userName +" welcome to My Website" + 
+  " and Time is " + now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0")  
 );
+// ===== Project Filter with Search =====
+document.addEventListener("DOMContentLoaded", () => {
+  const filterBar   = document.querySelector(".filter");
+  const cards       = Array.from(document.querySelectorAll(".projects-grid .card"));
+  const emptyState  = document.getElementById("emptyState");
+  const searchInput = document.getElementById("searchInput"); // added
+
+  let currentFilter = "all";
+  let currentSearch = "";
+//filter and search function
+  function applyFilter(value, query) {
+    let anyVisible = false;
+
+    cards.forEach(card => {
+      const category = (card.dataset.category || "").toLowerCase();
+      const text = (card.textContent || "").toLowerCase();
+      const matchesFilter = value === "all" || category === value;
+      const matchesSearch = !query || text.includes(query);
+      const shouldShow = matchesFilter && matchesSearch;
+
+      if (shouldShow) {
+        // show with fade-in
+        card.style.display = "block";
+        card.classList.add("is-hiding");
+        void card.offsetWidth; // reflow
+        card.classList.remove("is-hiding");
+        anyVisible = true;
+      } else {
+        // fade-out then hide
+        if (!card.classList.contains("is-hiding")) {
+          card.classList.add("is-hiding");
+          card.addEventListener("transitionend", function handler() {
+            card.style.display = "none";
+            card.removeEventListener("transitionend", handler);
+          }, { once: true });
+        }
+      }
+    });
+
+    emptyState.style.display = anyVisible ? "none" : "block";
+  }
+
+  // click-to-filter (event delegation)
+  if (filterBar) {
+    filterBar.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-filter]");
+      if (!btn) return;
+
+      // active state + accessibility
+      filterBar.querySelectorAll("button").forEach(b => {
+        b.classList.toggle("active", b === btn);
+        b.setAttribute("aria-pressed", b === btn ? "true" : "false");
+      });
+
+      currentFilter = btn.dataset.filter.toLowerCase();
+      applyFilter(currentFilter, currentSearch);
+    });
+
+    // live search input
+    if (searchInput) {
+      searchInput.addEventListener("input", (e) => {
+        currentSearch = e.target.value.trim().toLowerCase();
+        applyFilter(currentFilter, currentSearch);
+      });
+    }
+
+    // initial load: "all"
+    applyFilter("all", "");
+  }
+});
+//show/hide card details
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest(".details-btn");
+  if (!btn) return;
+
+  const detailsId = btn.getAttribute("aria-controls");
+  const details = document.getElementById(detailsId);
+  const card = btn.closest(".card");
+  const isOpen = btn.getAttribute("aria-expanded") === "true";
+
+  //close others so only one open at a time
+  document.querySelectorAll(".card-details:not([hidden])").forEach(p => {
+    if (p !== details) {
+      const otherBtn  = document.querySelector(`.details-btn[aria-controls="${p.id}"]`);
+      const otherCard = otherBtn?.closest(".card");
+      otherBtn?.setAttribute("aria-expanded", "false");
+      if (otherBtn) otherBtn.textContent = "Show Details";
+      p.classList.remove("open");
+      setTimeout(() => { p.hidden = true; }, 300);
+      otherCard?.classList.remove("expanded");
+    }
+  });
+
+  // Toggle current
+  btn.setAttribute("aria-expanded", String(!isOpen));
+  btn.textContent = isOpen ? "Show Details" : "Hide Details";
+   
+  if (isOpen) {
+    details.classList.remove("open");
+    setTimeout(() => { details.hidden = true; }, 300);
+  } else {
+    details.hidden = false;
+    requestAnimationFrame(() => details.classList.add("open"));
+  }
+});
+// ===== Two-button theme switcher (Dark / Light) =====
+document.addEventListener("DOMContentLoaded", () => {
+  const lightBtn = document.getElementById("lightBtn");
+  const darkBtn = document.getElementById("darkBtn");
+
+  // load saved preference or system preference
+  const saved = localStorage.getItem("theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const initial = saved || (prefersDark ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", initial);
+  updateActiveButton(initial);
+ // helper to update active button styles
+  function updateActiveButton(theme) {
+    if (theme === "dark") {
+      darkBtn.classList.add("active");
+      lightBtn.classList.remove("active");
+    } else {
+      lightBtn.classList.add("active");
+      darkBtn.classList.remove("active");
+    }
+  }
+// helper to set theme
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    updateActiveButton(theme);
+  }
+
+  lightBtn.addEventListener("click", () => setTheme("light"));
+  darkBtn.addEventListener("click", () => setTheme("dark"));
+});
+
+// === Fetch and display books from Google Books API ===
+const button = document.getElementById("loadBooks");
+const list = document.getElementById("booksList");
+const status = document.getElementById("booksStatus");
+
+button.addEventListener("click", function () {
+  status.textContent = "Loading...";
+  list.innerHTML = "";
+// Fetch books about programming
+fetch("https://www.googleapis.com/books/v1/volumes?q=programming+books&maxResults=5")
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      console.log(data);
+      const items = data.items;
+      list.innerHTML = "";
+      for (let i = 0; i < items.length; i++) {
+        const info = items[i].volumeInfo;
+       if (!info.imageLinks || !info.imageLinks.thumbnail) continue;
+       //remove books without images 
+       const img = info.imageLinks.thumbnail;
+        const authors = info.authors ? info.authors.join(", ") : "Unknown Author";
+
+        list.innerHTML += `
+          <div class="book-card">
+            <img src="${img}" alt="${info.title || "Book"}">
+            <h3>${info.title || "Untitled"}</h3>
+            <p>${authors}</p>
+          </div>
+        `;
+      }
+      status.textContent = "";
+    }) // error handling
+    .catch(function (err) {
+      console.error(err);
+      status.textContent = "Sorry, we have an error!";
+    });
+});
+
+
+
+// === Native field validation (+ success message) ===
+document.addEventListener("DOMContentLoaded", () => {
+  const form      = document.getElementById("contactForm");
+  const nameEl    = document.getElementById("name");
+  const emailEl   = document.getElementById("email");
+  const messageEl = document.getElementById("message");
+  const msg       = document.getElementById("formMessage");
+//if any element is missing, return null
+  if (!form || !nameEl || !emailEl || !messageEl || !msg) return;
+
+  // --- Name ---
+  nameEl.addEventListener("invalid", function () {
+    this.setCustomValidity(""); // reset first
+    if (this.validity.valueMissing) {
+      this.setCustomValidity("Name is required.");
+    }
+  });
+  nameEl.addEventListener("input", function () {
+    this.setCustomValidity("");
+  });
+
+  // --- Email ---
+  emailEl.addEventListener("invalid", function () {
+    this.setCustomValidity(""); // reset first
+    if (this.validity.valueMissing) {
+      this.setCustomValidity("Email is required.");
+    } else if (this.validity.typeMismatch) {
+      this.setCustomValidity("Enter a valid email address (must include '@' and '.')."); 
+    }
+  });
+  emailEl.addEventListener("input", function () {
+    this.setCustomValidity("");
+  });
+
+  // --- Message ---
+  messageEl.addEventListener("invalid", function () {
+    this.setCustomValidity(""); // reset first
+    if (this.validity.valueMissing) {
+      this.setCustomValidity("Message is required.");
+    }
+  });
+  messageEl.addEventListener("input", function () {
+    this.setCustomValidity("");
+  });
+
+  // --- Submit: let browser validate first, then show success ---
+  form.addEventListener("submit", function (e) {
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      form.reportValidity(); // show native bubbles
+      return;
+    }
+
+    e.preventDefault(); // valid: keep page here
+
+    msg.textContent = "Thank you! Your message has been sent successfully.";
+    
+
+    form.reset();
+
+    setTimeout(() => {
+      msg.textContent = "";
+    }, 4000);
+  });
+});
+
