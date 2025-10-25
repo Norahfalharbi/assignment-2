@@ -6,8 +6,8 @@ This is my homework a simple **portfolio website** built with HTML, CSS, and Jav
 
 
 # Setup instructions
-1. **Clone this repository**  
-   https://github.com/Norahfalharbi/assignment-1.git
+1. **Clone this repository in any html editor**  
+   https://github.com/Norahfalharbi/assignment-2.git
   
 2. **Open in a browser**
 
